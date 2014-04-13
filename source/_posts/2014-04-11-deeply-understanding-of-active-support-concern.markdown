@@ -108,4 +108,29 @@ class Dog
 end
 {% endcodeblock %}
 
-想法对了但上面这段代码是不能工作的。Why？原因是当Bath模块被include的时候base是CourtShip而不是Dog
+想法对了但上面这段代码是不能工作的。Why？原因是当Bath模块被include的时候base是CourtShip而不是Dog,这样的话，self.take_a_hot_bath方法就变成了CourtShip的singleton_method,Dog类无论是include还是extend都访问不到这个方法，所以就会报找不到方法"take_a_hot_bath"这个错误
+
+使用ActiveSupport::Corncern就帮助我们解决了这个问题
+{% codeblock lang:ruby %}
+require 'active_support/concern'
+module Bath
+  extend ActiveSupport::Concern
+  included do 
+    def self.take_a_hot_bath
+      puts "wow~"
+    end
+  end
+end
+
+module CourtShip
+  extend ActiveSupport::Concern
+  include Bath
+  included do
+    self.take_a_hot_bath
+  end
+end
+
+class Dog
+  include CourtShip
+end
+{% endcodeblock %}
