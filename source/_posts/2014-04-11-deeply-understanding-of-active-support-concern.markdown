@@ -3,7 +3,10 @@ layout: post
 title: "深入理解ActiveSupport::Concern"
 date: 2014-04-11 15:51:10 +0800
 comments: true
-categories: [ruby, rails]
+categories: ["ruby", "rails"]
+
+keywords: "activesupport::concern, 胖model, rails, model分层, activesupport::concern详解"
+description: "详细介绍和深入理解rails中activesupport:concern的作用"
 ---
 
 当model变得越来越胖的时候，很自然要给model减肥不是？要不然打开model一眼望去看不到头的方法会恼火死人！

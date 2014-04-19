@@ -4,7 +4,8 @@ title: "服务器端使用headless、watir-webdriver、nokogiri抓取ajax数据"
 date: 2014-04-05 21:26:48 +0800
 comments: true
 categories: ruby
-tags: [headless, watir-webdriver]
+keywords: "watir-webdriver, headless, nokogiri, ajax抓取, 服务器端部署watir-webdriver"
+description: "如何抓取ajax返回数据, 服务器断部署watir-webdirver"
 ---
 
 最近一个项目中需要去别的站点上扒下来些数据，但这个站的数据是ajax加载回来的。Nokogiri仅仅是个解析工具不能模拟浏览器的动作，所以要抓取ajax数据必须找个能模拟浏览器点击动作的工具，watir-webdriver就可以帮我们完成这个工作。
