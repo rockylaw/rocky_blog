@@ -52,22 +52,20 @@ def lambda_treat_return
   lamb.call
   puts "passed"
 end
-lambda_treat_return #=> passed
+lambda_treat_return #=> passed #return之后方法的执行并没有中断，继续执行
 
 def proc_treat_return
   proc = Proc.new{ return }
   proc.call
   puts "passed" 
 end
-proc_treat_return #=> 没有输出，return起效果了
+proc_treat_return #=> 没有输出，方法的执行中断了
 {% endcodeblock %}
-这就说明lambda对return关键字是不敏感的，lambda中得return并不会影响到包含它的方法，而proc中包含的return会影响到包含它的方法
+
+lambda中return之后方法体会继续向下执行，而proc中得return会直接退出方法
 
 另外可以通过'&'符号把一个proc对象转换成block
 {% codeblock lang:ruby %}
   proc = Proc.new{ puts "it's me"}
   2.times &proc #=> it's me it's me
 {% endcodeblock %}
-
-
-
