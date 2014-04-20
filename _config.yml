@@ -8,7 +8,7 @@ subtitle: I'm a programmer out of Shanghai City with interests in ruby. 不喧�
 author: Rocky Law
 simple_search: https://www.google.com/search
 description: "分享ruby语言中的心得和体会,钻研ruby on rails框架中各种组件的灵活用法"
-keywards: "ruby, rails, ruby on rails, activerecord, mongodb"
+keywords: "ruby, rails, ruby on rails, activerecord, mongodb"
 
 # Default date format is "ordinal" (resulting in "July 22nd 2007")
 # You can customize the format as defined in
