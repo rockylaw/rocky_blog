@@ -1,0 +1,526 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: ruby | Rocky Law's Blog]]></title>
+  <link href="http://rockylaw.github.io/rocky_blog/blog/categories/ruby/atom.xml" rel="self"/>
+  <link href="http://rockylaw.github.io/rocky_blog/"/>
+  <updated>2016-12-12T18:31:30+08:00</updated>
+  <id>http://rockylaw.github.io/rocky_blog/</id>
+  <author>
+    <name><![CDATA[Rocky Law]]></name>
+    <email><![CDATA[rockylaw@foxmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[block、proc和lambda的区别]]></title>
+    <link href="http://rockylaw.github.io/rocky_blog/blog/2014/04/19/difference-between-block-proc-and-lambda/"/>
+    <updated>2014-04-19T18:29:13+08:00</updated>
+    <id>http://rockylaw.github.io/rocky_blog/blog/2014/04/19/difference-between-block-proc-and-lambda</id>
+    <content type="html"><![CDATA[<p>这几个概念总是被人问起，搞来搞去的，搞晕了肿么办？谨以此文防止搞晕！</p>
+
+<p>首先要搞清出proc和lambda之间的区别，得给block正名
+block仅仅只是一个语法概念，而proc和lambda都是Proc类的对象,block离开了具体的上下文是不能执行的
+<div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="p">{</span> <span class="nb">puts</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="n">i</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;</span><span class="n">m</span> <span class="n">a</span> <span class="n">block</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="p">;</span> <span class="p">}</span> <span class="c1">#=&gt; 这是一个块block，单独执行会报SyntaxError</span>
+</span><span class='line'><span class="mi">2</span><span class="o">.</span><span class="n">times</span> <span class="p">{</span> <span class="nb">puts</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="n">i</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;</span><span class="n">m</span> <span class="n">a</span> <span class="n">block</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="p">;</span> <span class="p">}</span> <span class="c1">#=&gt; 给block一个执行环境（2.times）后，就能够被执行</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+由此可见block并不是一个对象，而指的是ruby中得一个语法现象，由一对花括号{}括起来或是有do..end关键字包裹起来的内容都是一个块（block），块离开了上下文执行环境是不能单独执行的。</p>
+
+<p>搞清了block这个概念之后，先来看看proc和lambda
+<div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">proc</span> <span class="o">=</span> <span class="no">Proc</span><span class="o">.</span><span class="n">new</span><span class="p">{</span> <span class="nb">puts</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="n">i</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;</span><span class="n">m</span> <span class="n">a</span> <span class="nb">proc</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="p">;</span> <span class="p">}</span>
+</span><span class='line'><span class="nb">proc</span><span class="o">.</span><span class="n">class</span> <span class="c1">#=&gt; Proc&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span><span class="n">lamb</span> <span class="o">=</span> <span class="nb">lambda</span><span class="p">{</span> <span class="nb">puts</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="n">i</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;</span><span class="n">m</span> <span class="n">a</span> <span class="nb">lambda</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="p">;</span> <span class="p">}</span>
+</span><span class='line'><span class="n">lamb</span><span class="o">.</span><span class="n">class</span> <span class="c1">#=&gt; Proc</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+这样我们就知道了proc对象和lambda对象实际上都是Proc类的对象。那么他们具体有什么不同呢？</p>
+
+<h2>lambda会检查参数的个数，而proc不会</h2>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">lamb</span> <span class="o">=</span> <span class="nb">lambda</span><span class="p">{</span><span class="o">|</span><span class="n">x</span><span class="o">|</span> <span class="nb">puts</span> <span class="n">x</span> <span class="p">}</span>
+</span><span class='line'><span class="n">lamb</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="n">first</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="p">;)</span> <span class="c1">#=&gt; first</span>
+</span><span class='line'><span class="n">lamb</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="n">first</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="p">;,</span><span class="o">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="n">second</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="p">;)</span> <span class="c1">#=&gt; ArgumentError: wrong number of arguments (2 for 1)&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span><span class="nb">proc</span> <span class="o">=</span> <span class="no">Proc</span><span class="o">.</span><span class="n">new</span><span class="p">{</span><span class="o">|</span><span class="n">x</span><span class="o">|</span> <span class="nb">puts</span> <span class="n">x</span> <span class="p">}</span>
+</span><span class='line'><span class="nb">proc</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="n">first</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="p">;)</span> <span class="c1">#=&gt; first</span>
+</span><span class='line'><span class="nb">proc</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="n">first</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="p">;,</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="n">second</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="p">;)</span> <span class="c1">#=&gt; first</span>
+</span><span class='line'><span class="nb">proc</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="n">first</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="p">;,</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="n">second</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="p">;,</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="n">third</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="p">;)</span> <span class="c1">#=&gt; first&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span><span class="nb">proc</span> <span class="o">=</span> <span class="no">Proc</span><span class="o">.</span><span class="n">new</span><span class="p">{</span><span class="o">|</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="o">|</span> <span class="nb">puts</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="p">}</span>
+</span><span class='line'><span class="nb">proc</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="n">first</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="p">;,</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="n">second</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="p">;,</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="n">third</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="p">;)</span> <span class="c1">#=&gt; first second&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+lambda对象会去检查传入参数的个数，而proc对象会默认忽略掉多余传入的参数</p>
+
+<h2>lambda和proc看待return关键字是不同的</h2>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">lambda_treat_return</span>
+</span><span class='line'>  <span class="n">lamb</span> <span class="o">=</span> <span class="nb">lambda</span><span class="p">{</span> <span class="k">return</span> <span class="p">}</span>
+</span><span class='line'>  <span class="n">lamb</span><span class="o">.</span><span class="n">call</span>
+</span><span class='line'>  <span class="nb">puts</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="n">passed</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="p">;</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'><span class="n">lambda_treat_return</span> <span class="c1">#=&gt; passed #return之后方法的执行并没有中断，继续执行&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span><span class="k">def</span> <span class="nf">proc_treat_return</span>
+</span><span class='line'>  <span class="nb">proc</span> <span class="o">=</span> <span class="no">Proc</span><span class="o">.</span><span class="n">new</span><span class="p">{</span> <span class="k">return</span> <span class="p">}</span>
+</span><span class='line'>  <span class="nb">proc</span><span class="o">.</span><span class="n">call</span>
+</span><span class='line'>  <span class="nb">puts</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="n">passed</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="p">;</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'><span class="n">proc_treat_return</span> <span class="c1">#=&gt; 没有输出，方法的执行中断了</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>lambda中return之后方法体会继续向下执行，而proc中得return会直接退出方法</p>
+
+<p>另外可以通过'&amp;&lsquo;符号把一个proc对象转换成block
+<div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="nb">proc</span> <span class="o">=</span> <span class="no">Proc</span><span class="o">.</span><span class="n">new</span><span class="p">{</span> <span class="nb">puts</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="n">it</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;</span><span class="n">s</span> <span class="n">me</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="p">;}</span>
+</span><span class='line'>  <span class="mi">2</span><span class="o">.</span><span class="n">times</span> <span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span><span class="nb">proc</span> <span class="c1">#=&gt; it&amp;rsquo;s me it&amp;rsquo;s me</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[深入理解ActiveSupport::Concern]]></title>
+    <link href="http://rockylaw.github.io/rocky_blog/blog/2014/04/11/deeply-understanding-of-active-support-concern/"/>
+    <updated>2014-04-11T15:51:10+08:00</updated>
+    <id>http://rockylaw.github.io/rocky_blog/blog/2014/04/11/deeply-understanding-of-active-support-concern</id>
+    <content type="html"><![CDATA[<p>当model变得越来越胖的时候，很自然要给model减肥不是？要不然打开model一眼望去看不到头的方法会恼火死人！
+不受人待见的胖model长得像下面这个样子：
+<div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">Dog</span>
+</span><span class='line'> <span class="c1">#&amp;hellip;此处略去平铺的200++个方法</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>很多NB大神祭出了自己给model减肥的方法，各有各的写法，大同小异，大概长得像下面这个样子：
+<div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">module</span> <span class="nn">Courtship</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">included</span><span class="p">(</span><span class="n">base</span><span class="p">)</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;pre&gt;&lt;code&gt;base.extend ClassMethods</span>
+</span><span class='line'><span class="sr">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;</span><span class="sr">/pre&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;  end&lt;/</span><span class="nb">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span>  <span class="k">module</span> <span class="nn">ClassMethods</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;pre&gt;&lt;code&gt;def feel_upset</span>
+</span><span class='line'><span class="sr">  puts &quot;&quot;</span>
+</span><span class='line'><span class="sr">end</span>
+</span><span class='line'><span class="sr">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;</span><span class="sr">/pre&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;  end&lt;/</span><span class="nb">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span>  <span class="k">def</span> <span class="nf">find_other_side</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;pre&gt;&lt;code&gt;puts &quot;where is my other side?&quot;</span>
+</span><span class='line'><span class="sr">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;</span><span class="sr">/pre&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;  end&lt;/</span><span class="nb">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span>  <span class="k">def</span> <span class="nf">say_love_you</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;pre&gt;&lt;code&gt;puts &quot;i love you&quot;</span>
+</span><span class='line'><span class="sr">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;</span><span class="sr">/pre&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;  end</span>
+</span><span class='line'><span class="sr">end&lt;/</span><span class="nb">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span><span class="k">class</span> <span class="nc">Dog</span>
+</span><span class='line'>  <span class="kp">include</span> <span class="no">Courtship</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>像上面这样就能把狗狗求爱的这个行为分离到一个模块中，这个模块中应该包含和求爱这个行为相关的方法。按照行为分离出来的模块才有被reuse的可能性。比如猫猫也不是要求爱嘛。。。</p>
+
+<p>传说中的核心成员们碰头一商量发现大家都这么干，千篇一律的，干脆搞到ActiveSupport里面去吧~，帮大家省两句代码吧。于是乎代码就变成下面这个样子了：
+<div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="p">;</span><span class="n">active_support</span><span class="o">/</span><span class="n">concern</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;module Courtship</span>
+</span><span class='line'><span class="sr">  extend ActiveSupport::Concern&lt;/</span><span class="nb">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="k">module</span> <span class="nn">ClassMethods</span>
+</span><span class='line'>   <span class="c1">#...</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'><span class="o">&lt;</span><span class="sr">/code&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span>  <span class="c1">#&amp;hellip;</span>
+</span><span class='line'><span class="k">end</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;class Dog</span>
+</span><span class='line'><span class="sr">  include Courtship</span>
+</span><span class='line'><span class="sr">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>如果你真的相信CoreTeam为了体恤民情帮大家省两句代码，那就跟我一样太XX了！！~其实ActiveSupport::Concern主要帮我们解决了模块之间的依赖问题。模块之间的依赖其实就是假如模块B中调用了模块A中得方法那么我们就说模块B依赖模块A，回到狗狗的例子，比如狗狗求爱的模块依赖一个名叫洗澡的模块，求爱之前总是要整理整理干净嘛。。。像下面这个样子
+<div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">module</span> <span class="nn">Bath</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">included</span><span class="p">(</span><span class="n">base</span><span class="p">)</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;pre&gt;&lt;code&gt;base.class_eval do</span>
+</span><span class='line'><span class="sr">  def self.take_a_hot_bath</span>
+</span><span class='line'><span class="sr">    puts &quot;wow~&quot;</span>
+</span><span class='line'><span class="sr">  end</span>
+</span><span class='line'><span class="sr">end</span>
+</span><span class='line'><span class="sr">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;</span><span class="sr">/pre&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;  end</span>
+</span><span class='line'><span class="sr">end&lt;/</span><span class="nb">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span><span class="k">module</span> <span class="nn">CourtShip</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">included</span><span class="p">(</span><span class="n">base</span><span class="p">)</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;pre&gt;&lt;code&gt;base.extend ClassMethods</span>
+</span><span class='line'><span class="sr">base.take_a_hot_bath #洗个热水澡，这里调用了Bath模块中的方法</span>
+</span><span class='line'><span class="sr">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;</span><span class="sr">/pre&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;  end</span>
+</span><span class='line'><span class="sr">  module ClassMethods</span>
+</span><span class='line'><span class="sr">   #&amp;hellip;</span>
+</span><span class='line'><span class="sr">  end</span>
+</span><span class='line'><span class="sr">  #&amp;hellip;</span>
+</span><span class='line'><span class="sr">end&lt;/</span><span class="nb">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span><span class="k">class</span> <span class="nc">Dog</span>
+</span><span class='line'>  <span class="kp">include</span> <span class="no">Bath</span>   <span class="c1">#引入Bath模块，这个是被逼的，因为Courtship中使用了Bath的方法</span>
+</span><span class='line'>  <span class="kp">include</span> <span class="no">Courtship</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>上面这个例子里面Dog类本不应该去关心CourtShip和Bath之间的依赖关系对吧？要是引用N多模块难道我们还要搞清楚他们之间复杂的依赖关系吗？所以很自然想到为什么不在CourtShip里面把Bath模块引入进来，然后在Dog类中只引入CourtShip模块呢？把依赖交给模块自身去处理这点思路肯定是对的，好我们这么做试试看
+<div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">module</span> <span class="nn">Bath</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;h1&gt;&amp;hellip;&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span><span class="k">end</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;module CourtShip</span>
+</span><span class='line'><span class="sr"> include Bath&lt;/</span><span class="nb">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span>  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">included</span><span class="p">(</span><span class="n">base</span><span class="p">)</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;pre&gt;&lt;code&gt;base.take_a_hot_bath      </span>
+</span><span class='line'><span class="sr">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;</span><span class="sr">/pre&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;  end</span>
+</span><span class='line'><span class="sr">end&lt;/</span><span class="nb">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span><span class="k">class</span> <span class="nc">Dog</span>
+</span><span class='line'> <span class="kp">include</span> <span class="no">CourtShip</span> <span class="c1">#undefined method `take_a_hot_bath&#39; for Dog:Class</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>想法对了但上面这段代码是不能工作的。Why？原因是当Bath模块被include的时候base是CourtShip而不是Dog,这样的话，self.take_a_hot_bath方法就变成了CourtShip的singleton_method,Dog类无论是include还是extend都访问不到这个方法，所以就会报找不到方法"take_a_hot_bath"这个错误</p>
+
+<p>使用ActiveSupport::Corncern就帮助我们解决了这个问题
+<div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="p">;</span><span class="n">active_support</span><span class="o">/</span><span class="n">concern</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;</span>
+</span><span class='line'><span class="k">module</span> <span class="nn">Bath</span>
+</span><span class='line'>  <span class="kp">extend</span> <span class="ss">ActiveSupport</span><span class="p">:</span><span class="ss">:Concern</span>
+</span><span class='line'>  <span class="n">included</span> <span class="k">do</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;pre&gt;&lt;code&gt;def self.take_a_hot_bath</span>
+</span><span class='line'><span class="sr">  puts &quot;wow~&quot;</span>
+</span><span class='line'><span class="sr">end</span>
+</span><span class='line'><span class="sr">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;</span><span class="sr">/pre&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;  end</span>
+</span><span class='line'><span class="sr">end&lt;/</span><span class="nb">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span><span class="k">module</span> <span class="nn">CourtShip</span>
+</span><span class='line'>  <span class="kp">extend</span> <span class="ss">ActiveSupport</span><span class="p">:</span><span class="ss">:Concern</span>
+</span><span class='line'>  <span class="kp">include</span> <span class="no">Bath</span>
+</span><span class='line'>  <span class="n">included</span> <span class="k">do</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;pre&gt;&lt;code&gt;self.take_a_hot_bath</span>
+</span><span class='line'><span class="sr">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;</span><span class="sr">/pre&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;  end</span>
+</span><span class='line'><span class="sr">end&lt;/</span><span class="nb">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span><span class="k">class</span> <span class="nc">Dog</span>
+</span><span class='line'>  <span class="kp">include</span> <span class="no">CourtShip</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[服务器端使用headless、watir-webdriver、nokogiri抓取ajax数据]]></title>
+    <link href="http://rockylaw.github.io/rocky_blog/blog/2014/04/05/use-headless-watir-webdriver-and-nokogiri-to-get-the-back-content-of-ajax/"/>
+    <updated>2014-04-05T21:26:48+08:00</updated>
+    <id>http://rockylaw.github.io/rocky_blog/blog/2014/04/05/use-headless-watir-webdriver-and-nokogiri-to-get-the-back-content-of-ajax</id>
+    <content type="html"><![CDATA[<p>最近一个项目中需要去别的站点上扒下来些数据，但这个站的数据是ajax加载回来的。Nokogiri仅仅是个解析工具不能模拟浏览器的动作，所以要抓取ajax数据必须找个能模拟浏览器点击动作的工具，watir-webdriver就可以帮我们完成这个工作。</p>
+
+<p>watir-webdriver是一款能模拟多种浏览器动作的自动化测试工具。例如填写浏览器表单并提交。</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;require &amp;lsquo;watir-webdriver&amp;rsquo;&lt;/</span><span class="nb">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span><span class="n">b</span> <span class="o">=</span> <span class="ss">Watir</span><span class="p">:</span><span class="ss">:Browser</span><span class="o">.</span><span class="n">new</span>
+</span><span class='line'><span class="n">b</span><span class="o">.</span><span class="n">goto</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="p">;</span><span class="n">bit</span><span class="o">.</span><span class="n">ly</span><span class="o">/</span><span class="n">watir</span><span class="o">-</span><span class="n">webdriver</span><span class="o">-</span><span class="n">demo</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;</span>
+</span><span class='line'><span class="n">b</span><span class="o">.</span><span class="n">text_field</span><span class="p">(</span><span class="ss">:id</span> <span class="o">=&gt;</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="p">;</span><span class="n">entry_0</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;)</span><span class="o">.</span><span class="n">set</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="p">;</span><span class="n">your</span> <span class="nb">name</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;</span>
+</span><span class='line'><span class="n">b</span><span class="o">.</span><span class="n">select_list</span><span class="p">(</span><span class="ss">:id</span> <span class="o">=&gt;</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="p">;</span><span class="n">entry_1</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;)</span><span class="o">.</span><span class="n">select</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="p">;</span><span class="no">Ruby</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;</span>
+</span><span class='line'><span class="n">b</span><span class="o">.</span><span class="n">select_list</span><span class="p">(</span><span class="ss">:id</span> <span class="o">=&gt;</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="p">;</span><span class="n">entry_1</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;)</span><span class="o">.</span><span class="n">selected?</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="p">;</span><span class="no">Ruby</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;</span>
+</span><span class='line'><span class="n">b</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="ss">:name</span> <span class="o">=&gt;</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="p">;</span><span class="n">submit</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;)</span><span class="o">.</span><span class="n">click</span>
+</span><span class='line'><span class="n">b</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">include?</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="p">;</span><span class="no">Thank</span> <span class="n">you</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>上面这段代码就会自动的填好表单帮你点击Submit！</p>
+
+<p>我的应用场景是抓取一个"Load More&hellip;&ldquo;分页后的内容，这个分页当然是ajax的了,我是这么做的：</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="p">;</span><span class="n">nokogiri</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;</span>
+</span><span class='line'><span class="nb">require</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="p">;</span><span class="n">watir</span><span class="o">-</span><span class="n">webdriver</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;browser = Watir::Browser.new #实例化一个browser对象（默认是Firefox）</span>
+</span><span class='line'><span class="sr">browser.goto your_url #your_url是你要打开的页面</span>
+</span><span class='line'><span class="sr">browser.a(:class =&gt; &amp;lsquo;getmore&amp;rsquo;).click # load more的css是&#39;getmore&#39;,这样就触发了加载更多的动作</span>
+</span><span class='line'><span class="sr">sleep(5) #网络条件不好的时候等等，等页面完全渲染完成以后</span>
+</span><span class='line'><span class="sr">doc = Nokogiri::HTML(browser.html) #将加载回来的结果传给Nokogiri去解析</span>
+</span><span class='line'><span class="sr">content = doc.xpath(&amp;ldquo;your-xpath&amp;rdquo;) #获取内容！yeah！</span>
+</span><span class='line'><span class="sr">browser.close #别忘了关闭！&lt;/</span><span class="nb">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>本地测试了一下，It works! 正高兴的时候发现了还有一个问题没有解决，上面的代码打开我本地的Firefox浏览器，但是我这个脚本是要部署的服务器上的啊，服务器上又没有图形化的浏览器让我打开。。。这时候一顿找，终于找到了！headless！</p>
+
+<p>headless其实是ruby把Xvfb库封装了一下，有了这东西，watir-webdriver就可以不用调用GUI的Firefox了。
+果断</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'> <span class="n">gem</span> <span class="n">install</span> <span class="n">headless</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>使用headless后，代码也要相应的修改一下：</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>require &amp;lsquo;nokogiri&amp;rsquo;
+</span><span class='line'>require &amp;lsquo;watir-webdriver&amp;rsquo;
+</span><span class='line'>require &amp;lsquo;headless&amp;rsquo;&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;headless <span class="o">=</span> Headless.new <span class="c">#实例化headless</span>
+</span><span class='line'>headless.start <span class="c">#启动&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;browser <span class="o">=</span> Watir::Browser.new
+</span><span class='line'>browser.goto your_url
+</span><span class='line'>browser.a<span class="o">(</span>:class <span class="o">=</span>&gt; &amp;lsquo;getmore&amp;rsquo;<span class="o">)</span>.click
+</span><span class='line'><span class="nv">doc</span> <span class="o">=</span> Nokogiri::HTML<span class="o">(</span>browser.html<span class="o">)</span>
+</span><span class='line'><span class="nv">content</span> <span class="o">=</span> doc.xpath<span class="o">(</span>&amp;ldquo;your-xpath&amp;rdquo;<span class="o">)</span>
+</span><span class='line'>browser.close&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;headless.destroy <span class="c">#销毁headless对象</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>这样的执行这段代码，就不会打开浏览器了。大功告成！</p>
+]]></content>
+  </entry>
+  
+</feed>

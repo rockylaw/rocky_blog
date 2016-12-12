@@ -1,0 +1,330 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>block、proc和lambda的区别 - Rocky Law's Blog</title>
+  <meta name="author" content="Rocky Law">
+
+   
+  <meta name="description" content="ruby语言中block, Proc和Lambda的区别">
+  
+  <meta name="keywords" content="ruby, block, proc, lambda, lambda和proc的区别">
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://rockylaw.github.io/rocky_blog/blog/2014/04/19/difference-between-block-proc-and-lambda">
+  <link href="/rocky_blog/favicon.png" rel="icon">
+  <link href='http://fonts.googleapis.com/css?family=Quicksand:300,400' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300' rel='stylesheet' type='text/css'>
+  <link href="/rocky_blog/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Rocky Law's Blog" type="application/atom+xml">
+  <script src="/js/jquery.js"></script>
+  <script src="/js/bootstrap-collapse.js"></script>
+  <script src="/rocky_blog/js/modernizr-2.0.js"></script>
+  <script src="/rocky_blog/js/octopress.js" type="text/javascript"></script>
+  <script src="/js/application.js"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <div class="navbar navbar-inverse navbar-static-top">
+  	<div class="navbar-inner">
+  	  <div class="container">
+        <a class="btn btn-navbar" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+          <span class="fui-menu-24"></span>
+        </a>
+  	  	<div class="nav-collapse collapse navbar-responsive-collapse" style="height:0;">
+  	      <ul class="nav">
+    
+        <li ><a href="/index.html">Home</a></li>
+    
+        <li ><a href="/blog/archives">Archive</a></li>
+    
+</ul>
+
+<ul class="nav pull-right">
+    
+    <li><a href="http://github.com/rockylaw" title="Github Profile"><i class="icon-github-sign social-navbar"></i></a></li>
+    
+    
+    
+    
+    <li><a href="http://twitter.com/_rockylaw" title="Twitter Profile"><i class="icon-twitter-sign social-navbar"></i></a></li>
+    
+    
+    
+    
+
+    
+    <li><a href="mailto:rockylaw@foxmail.com" title="Email"><i class="icon-envelope social-navbar"></i></a></li>
+    
+</ul>
+
+  	    </div>
+  	  </div>
+  	</div>
+  </div>
+  <div class="container" id="main">
+      <div class="row-fluid">
+        <div id="content">
+          <div>
+<article class="hentry" role="article">
+  
+
+  <header>
+  <div class="jumbotron">
+    Block、proc和lambda的区别
+	<h5>
+
+
+
+
+
+
+
+
+  
+
+
+<i class="icon-calendar-empty"></i> <time datetime="2014-04-19T18:29:13+08:00" pubdate data-updated="true">Apr 19<span>th</span>, 2014</time></h5>
+  </div>
+</header>
+  <div class="row-fluid">
+    <div class="span12">
+      <p>这几个概念总是被人问起，搞来搞去的，搞晕了肿么办？谨以此文防止搞晕！</p>
+
+<p>首先要搞清出proc和lambda之间的区别，得给block正名
+block仅仅只是一个语法概念，而proc和lambda都是Proc类的对象,block离开了具体的上下文是不能执行的</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="p">{</span> <span class="nb">puts</span> <span class="s2">&quot;i&#39;m a block&quot;</span> <span class="p">}</span> <span class="c1">#=&gt; 这是一个块block，单独执行会报SyntaxError</span>
+</span><span class='line'><span class="mi">2</span><span class="o">.</span><span class="n">times</span> <span class="p">{</span> <span class="nb">puts</span> <span class="s2">&quot;i&#39;m a block&quot;</span> <span class="p">}</span> <span class="c1">#=&gt; 给block一个执行环境（2.times）后，就能够被执行</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>由此可见block并不是一个对象，而指的是ruby中得一个语法现象，由一对花括号{}括起来或是有do..end关键字包裹起来的内容都是一个块（block），块离开了上下文执行环境是不能单独执行的。</p>
+
+<p>搞清了block这个概念之后，先来看看proc和lambda</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">proc</span> <span class="o">=</span> <span class="no">Proc</span><span class="o">.</span><span class="n">new</span><span class="p">{</span> <span class="nb">puts</span> <span class="s2">&quot;i&#39;m a proc&quot;</span> <span class="p">}</span>
+</span><span class='line'><span class="nb">proc</span><span class="o">.</span><span class="n">class</span> <span class="c1">#=&gt; Proc</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">lamb</span> <span class="o">=</span> <span class="nb">lambda</span><span class="p">{</span> <span class="nb">puts</span> <span class="s2">&quot;i&#39;m a lambda&quot;</span> <span class="p">}</span>
+</span><span class='line'><span class="n">lamb</span><span class="o">.</span><span class="n">class</span> <span class="c1">#=&gt; Proc</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这样我们就知道了proc对象和lambda对象实际上都是Proc类的对象。那么他们具体有什么不同呢？</p>
+
+<h2>lambda会检查参数的个数，而proc不会</h2>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">lamb</span> <span class="o">=</span> <span class="nb">lambda</span><span class="p">{</span><span class="o">|</span><span class="n">x</span><span class="o">|</span> <span class="nb">puts</span> <span class="n">x</span> <span class="p">}</span>
+</span><span class='line'><span class="n">lamb</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="s2">&quot;first&quot;</span><span class="p">)</span> <span class="c1">#=&gt; first</span>
+</span><span class='line'><span class="n">lamb</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="s2">&quot;first&quot;</span><span class="p">,</span><span class="s2">&quot;second&quot;</span><span class="p">)</span> <span class="c1">#=&gt; ArgumentError: wrong number of arguments (2 for 1)</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">proc</span> <span class="o">=</span> <span class="no">Proc</span><span class="o">.</span><span class="n">new</span><span class="p">{</span><span class="o">|</span><span class="n">x</span><span class="o">|</span> <span class="nb">puts</span> <span class="n">x</span> <span class="p">}</span>
+</span><span class='line'><span class="nb">proc</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="s2">&quot;first&quot;</span><span class="p">)</span> <span class="c1">#=&gt; first</span>
+</span><span class='line'><span class="nb">proc</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="s2">&quot;first&quot;</span><span class="p">,</span> <span class="s2">&quot;second&quot;</span><span class="p">)</span> <span class="c1">#=&gt; first</span>
+</span><span class='line'><span class="nb">proc</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="s2">&quot;first&quot;</span><span class="p">,</span> <span class="s2">&quot;second&quot;</span><span class="p">,</span> <span class="s2">&quot;third&quot;</span><span class="p">)</span> <span class="c1">#=&gt; first</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">proc</span> <span class="o">=</span> <span class="no">Proc</span><span class="o">.</span><span class="n">new</span><span class="p">{</span><span class="o">|</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="o">|</span> <span class="nb">puts</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="p">}</span>
+</span><span class='line'><span class="nb">proc</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="s2">&quot;first&quot;</span><span class="p">,</span> <span class="s2">&quot;second&quot;</span><span class="p">,</span> <span class="s2">&quot;third&quot;</span><span class="p">)</span> <span class="c1">#=&gt; first second</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>lambda对象会去检查传入参数的个数，而proc对象会默认忽略掉多余传入的参数</p>
+
+<h2>lambda和proc看待return关键字是不同的</h2>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">lambda_treat_return</span>
+</span><span class='line'>  <span class="n">lamb</span> <span class="o">=</span> <span class="nb">lambda</span><span class="p">{</span> <span class="k">return</span> <span class="p">}</span>
+</span><span class='line'>  <span class="n">lamb</span><span class="o">.</span><span class="n">call</span>
+</span><span class='line'>  <span class="nb">puts</span> <span class="s2">&quot;passed&quot;</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'><span class="n">lambda_treat_return</span> <span class="c1">#=&gt; passed #return之后方法的执行并没有中断，继续执行</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">proc_treat_return</span>
+</span><span class='line'>  <span class="nb">proc</span> <span class="o">=</span> <span class="no">Proc</span><span class="o">.</span><span class="n">new</span><span class="p">{</span> <span class="k">return</span> <span class="p">}</span>
+</span><span class='line'>  <span class="nb">proc</span><span class="o">.</span><span class="n">call</span>
+</span><span class='line'>  <span class="nb">puts</span> <span class="s2">&quot;passed&quot;</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'><span class="n">proc_treat_return</span> <span class="c1">#=&gt; 没有输出，方法的执行中断了</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>lambda中return之后方法体会继续向下执行，而proc中得return会直接退出方法</p>
+
+<p>另外可以通过&#8217;&amp;&lsquo;符号把一个proc对象转换成block</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="nb">proc</span> <span class="o">=</span> <span class="no">Proc</span><span class="o">.</span><span class="n">new</span><span class="p">{</span> <span class="nb">puts</span> <span class="s2">&quot;it&#39;s me&quot;</span><span class="p">}</span>
+</span><span class='line'>  <span class="mi">2</span><span class="o">.</span><span class="n">times</span> <span class="o">&amp;</span><span class="nb">proc</span> <span class="c1">#=&gt; it&#39;s me it&#39;s me</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+    </div>
+  </div>
+
+
+
+  <footer>
+    <hr>
+    
+    <div class="row-fluid">
+      
+      <div class="span6">
+        <p class="meta">
+        
+        
+
+
+
+  <a href="/rocky_blog/blog/categories/ruby/"><span class="badge">ruby</span></a>
+
+
+
+
+        </p>
+      </div>
+      
+      <div class="span6 social-sharing">
+        <div class="sharing">
+  <div class="addthis_toolbox addthis_default_style ">
+  
+  
+  <a class="addthis_button_tweet"></a>
+  
+  
+  <a class="addthis_counter addthis_pill_style"></a>
+  </div>
+  <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid="></script>
+</div>
+
+      </div>
+      
+      
+    </div>
+    
+    <div class="row-fluid">
+      <div class="span12">
+        <p class="meta">
+          
+            <a class="basic-alignment left" href="/rocky_blog/blog/2014/04/11/deeply-understanding-of-active-support-concern/" title="Previous Post: 深入理解ActiveSupport::Concern">&laquo; 深入理解ActiveSupport::Concern</a>
+          
+          
+            <a class="basic-alignment right" href="/rocky_blog/blog/2014/08/17/new-start/" title="Next Post: 新开始">新开始 &raquo;</a>
+          
+        </p>
+      </div>
+    </div>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+
+
+        </div>
+      </div>
+      <div class="row-fluid">
+        <footer class="footer-page" role="contentinfo">
+          <p>
+  Copyright &copy; 2016 - Rocky Law -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span> - Theme by <a href="http://alexgaribay.com">Alex Garibay</a>
+</p>
+
+
+        </footer>
+      </div>
+  </div>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'rocky-law';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://rockylaw.github.io/rocky_blog/blog/2014/04/19/difference-between-block-proc-and-lambda/';
+        var disqus_url = 'http://rockylaw.github.io/rocky_blog/blog/2014/04/19/difference-between-block-proc-and-lambda/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

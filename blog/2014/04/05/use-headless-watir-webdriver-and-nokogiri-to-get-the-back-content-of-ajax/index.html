@@ -1,0 +1,323 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>服务器端使用headless、watir-webdriver、nokogiri抓取ajax数据 - Rocky Law's Blog</title>
+  <meta name="author" content="Rocky Law">
+
+   
+  <meta name="description" content="如何抓取ajax返回数据, 服务器断部署watir-webdirver">
+  
+  <meta name="keywords" content="watir-webdriver, headless, nokogiri, ajax抓取, 服务器端部署watir-webdriver">
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://rockylaw.github.io/rocky_blog/blog/2014/04/05/use-headless-watir-webdriver-and-nokogiri-to-get-the-back-content-of-ajax">
+  <link href="/rocky_blog/favicon.png" rel="icon">
+  <link href='http://fonts.googleapis.com/css?family=Quicksand:300,400' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300' rel='stylesheet' type='text/css'>
+  <link href="/rocky_blog/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Rocky Law's Blog" type="application/atom+xml">
+  <script src="/js/jquery.js"></script>
+  <script src="/js/bootstrap-collapse.js"></script>
+  <script src="/rocky_blog/js/modernizr-2.0.js"></script>
+  <script src="/rocky_blog/js/octopress.js" type="text/javascript"></script>
+  <script src="/js/application.js"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <div class="navbar navbar-inverse navbar-static-top">
+  	<div class="navbar-inner">
+  	  <div class="container">
+        <a class="btn btn-navbar" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+          <span class="fui-menu-24"></span>
+        </a>
+  	  	<div class="nav-collapse collapse navbar-responsive-collapse" style="height:0;">
+  	      <ul class="nav">
+    
+        <li ><a href="/index.html">Home</a></li>
+    
+        <li ><a href="/blog/archives">Archive</a></li>
+    
+</ul>
+
+<ul class="nav pull-right">
+    
+    <li><a href="http://github.com/rockylaw" title="Github Profile"><i class="icon-github-sign social-navbar"></i></a></li>
+    
+    
+    
+    
+    <li><a href="http://twitter.com/_rockylaw" title="Twitter Profile"><i class="icon-twitter-sign social-navbar"></i></a></li>
+    
+    
+    
+    
+
+    
+    <li><a href="mailto:rockylaw@foxmail.com" title="Email"><i class="icon-envelope social-navbar"></i></a></li>
+    
+</ul>
+
+  	    </div>
+  	  </div>
+  	</div>
+  </div>
+  <div class="container" id="main">
+      <div class="row-fluid">
+        <div id="content">
+          <div>
+<article class="hentry" role="article">
+  
+
+  <header>
+  <div class="jumbotron">
+    服务器端使用headless、watir-webdriver、nokogiri抓取ajax数据
+	<h5>
+
+
+
+
+
+
+
+
+  
+
+
+<i class="icon-calendar-empty"></i> <time datetime="2014-04-05T21:26:48+08:00" pubdate data-updated="true">Apr 5<span>th</span>, 2014</time></h5>
+  </div>
+</header>
+  <div class="row-fluid">
+    <div class="span12">
+      <p>最近一个项目中需要去别的站点上扒下来些数据，但这个站的数据是ajax加载回来的。Nokogiri仅仅是个解析工具不能模拟浏览器的动作，所以要抓取ajax数据必须找个能模拟浏览器点击动作的工具，watir-webdriver就可以帮我们完成这个工作。</p>
+
+<p>watir-webdriver是一款能模拟多种浏览器动作的自动化测试工具。例如填写浏览器表单并提交。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;watir-webdriver&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">b</span> <span class="o">=</span> <span class="ss">Watir</span><span class="p">:</span><span class="ss">:Browser</span><span class="o">.</span><span class="n">new</span>
+</span><span class='line'><span class="n">b</span><span class="o">.</span><span class="n">goto</span> <span class="s1">&#39;bit.ly/watir-webdriver-demo&#39;</span>
+</span><span class='line'><span class="n">b</span><span class="o">.</span><span class="n">text_field</span><span class="p">(</span><span class="ss">:id</span> <span class="o">=&gt;</span> <span class="s1">&#39;entry_0&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">set</span> <span class="s1">&#39;your name&#39;</span>
+</span><span class='line'><span class="n">b</span><span class="o">.</span><span class="n">select_list</span><span class="p">(</span><span class="ss">:id</span> <span class="o">=&gt;</span> <span class="s1">&#39;entry_1&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">select</span> <span class="s1">&#39;Ruby&#39;</span>
+</span><span class='line'><span class="n">b</span><span class="o">.</span><span class="n">select_list</span><span class="p">(</span><span class="ss">:id</span> <span class="o">=&gt;</span> <span class="s1">&#39;entry_1&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">selected?</span> <span class="s1">&#39;Ruby&#39;</span>
+</span><span class='line'><span class="n">b</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s1">&#39;submit&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">click</span>
+</span><span class='line'><span class="n">b</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">include?</span> <span class="s1">&#39;Thank you&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>上面这段代码就会自动的填好表单帮你点击Submit！</p>
+
+<p>我的应用场景是抓取一个&#8221;Load More&hellip;&ldquo;分页后的内容，这个分页当然是ajax的了,我是这么做的：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;nokogiri&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;watir-webdriver&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">browser</span> <span class="o">=</span> <span class="ss">Watir</span><span class="p">:</span><span class="ss">:Browser</span><span class="o">.</span><span class="n">new</span> <span class="c1">#实例化一个browser对象（默认是Firefox）</span>
+</span><span class='line'><span class="n">browser</span><span class="o">.</span><span class="n">goto</span> <span class="n">your_url</span> <span class="c1">#your_url是你要打开的页面</span>
+</span><span class='line'><span class="n">browser</span><span class="o">.</span><span class="n">a</span><span class="p">(</span><span class="ss">:class</span> <span class="o">=&gt;</span> <span class="s1">&#39;getmore&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">click</span> <span class="c1"># load more的css是&#39;getmore&#39;,这样就触发了加载更多的动作</span>
+</span><span class='line'><span class="nb">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="c1">#网络条件不好的时候等等，等页面完全渲染完成以后</span>
+</span><span class='line'><span class="n">doc</span> <span class="o">=</span> <span class="ss">Nokogiri</span><span class="p">:</span><span class="ss">:HTML</span><span class="p">(</span><span class="n">browser</span><span class="o">.</span><span class="n">html</span><span class="p">)</span> <span class="c1">#将加载回来的结果传给Nokogiri去解析</span>
+</span><span class='line'><span class="n">content</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s2">&quot;your-xpath&quot;</span><span class="p">)</span> <span class="c1">#获取内容！yeah！</span>
+</span><span class='line'><span class="n">browser</span><span class="o">.</span><span class="n">close</span> <span class="c1">#别忘了关闭！</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>本地测试了一下，It works! 正高兴的时候发现了还有一个问题没有解决，上面的代码打开我本地的Firefox浏览器，但是我这个脚本是要部署的服务器上的啊，服务器上又没有图形化的浏览器让我打开。。。这时候一顿找，终于找到了！headless！</p>
+
+<p>headless其实是ruby把Xvfb库封装了一下，有了这东西，watir-webdriver就可以不用调用GUI的Firefox了。
+果断</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'> <span class="n">gem</span> <span class="n">install</span> <span class="n">headless</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>使用headless后，代码也要相应的修改一下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>require <span class="s1">&#39;nokogiri&#39;</span>
+</span><span class='line'>require <span class="s1">&#39;watir-webdriver&#39;</span>
+</span><span class='line'>require <span class="s1">&#39;headless&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">headless</span> <span class="o">=</span> Headless.new <span class="c">#实例化headless</span>
+</span><span class='line'>headless.start <span class="c">#启动</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">browser</span> <span class="o">=</span> Watir::Browser.new
+</span><span class='line'>browser.goto your_url
+</span><span class='line'>browser.a<span class="o">(</span>:class <span class="o">=</span>&gt; <span class="s1">&#39;getmore&#39;</span><span class="o">)</span>.click
+</span><span class='line'><span class="nv">doc</span> <span class="o">=</span> Nokogiri::HTML<span class="o">(</span>browser.html<span class="o">)</span>
+</span><span class='line'><span class="nv">content</span> <span class="o">=</span> doc.xpath<span class="o">(</span><span class="s2">&quot;your-xpath&quot;</span><span class="o">)</span>
+</span><span class='line'>browser.close
+</span><span class='line'>
+</span><span class='line'>headless.destroy <span class="c">#销毁headless对象</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这样的执行这段代码，就不会打开浏览器了。大功告成！</p>
+
+    </div>
+  </div>
+
+
+
+  <footer>
+    <hr>
+    
+    <div class="row-fluid">
+      
+      <div class="span6">
+        <p class="meta">
+        
+        
+
+
+
+  <a href="/rocky_blog/blog/categories/ruby/"><span class="badge">ruby</span></a>
+
+
+
+
+        </p>
+      </div>
+      
+      <div class="span6 social-sharing">
+        <div class="sharing">
+  <div class="addthis_toolbox addthis_default_style ">
+  
+  
+  <a class="addthis_button_tweet"></a>
+  
+  
+  <a class="addthis_counter addthis_pill_style"></a>
+  </div>
+  <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid="></script>
+</div>
+
+      </div>
+      
+      
+    </div>
+    
+    <div class="row-fluid">
+      <div class="span12">
+        <p class="meta">
+          
+          
+            <a class="basic-alignment right" href="/rocky_blog/blog/2014/04/11/deeply-understanding-of-active-support-concern/" title="Next Post: 深入理解ActiveSupport::Concern">深入理解ActiveSupport::Concern &raquo;</a>
+          
+        </p>
+      </div>
+    </div>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+
+
+        </div>
+      </div>
+      <div class="row-fluid">
+        <footer class="footer-page" role="contentinfo">
+          <p>
+  Copyright &copy; 2016 - Rocky Law -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span> - Theme by <a href="http://alexgaribay.com">Alex Garibay</a>
+</p>
+
+
+        </footer>
+      </div>
+  </div>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'rocky-law';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://rockylaw.github.io/rocky_blog/blog/2014/04/05/use-headless-watir-webdriver-and-nokogiri-to-get-the-back-content-of-ajax/';
+        var disqus_url = 'http://rockylaw.github.io/rocky_blog/blog/2014/04/05/use-headless-watir-webdriver-and-nokogiri-to-get-the-back-content-of-ajax/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
