@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: thinking | Rocky Law's Blog]]></title>
+  <link href="http://rockylaw.me/blog/categories/thinking/atom.xml" rel="self"/>
+  <link href="http://rockylaw.me/"/>
+  <updated>2016-12-12T17:25:36+08:00</updated>
+  <id>http://rockylaw.me/</id>
+  <author>
+    <name><![CDATA[Rocky Law]]></name>
+    <email><![CDATA[rockylaw@foxmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[新开始]]></title>
+    <link href="http://rockylaw.me/blog/2014/08/17/new-start/"/>
+    <updated>2014-08-17T21:38:03+08:00</updated>
+    <id>http://rockylaw.me/blog/2014/08/17/new-start</id>
+    <content type="html"><![CDATA[<p>从上海回西安也有一段时间了，这段时间发生了比较重要的的两件事</p>
+
+<h3>我当了父亲</h3>
+
+<h3>加入了Thoughtworks</h3>
+
+<p>初为人父，喜悦之下更多了几分责任感，每每看到女儿的笑脸，心中暗暗下定决心要做一个让她骄傲地好爸爸。</p>
+
+<p>回到西安给女儿创造一个稳定的安逸的成长环境是我的初衷，所以无论如何也要让自己爱上这里。敞开心扉，让自己接纳所有的好和不好，抛开比较的心态，既然选择了就要义无反顾。</p>
+
+<h4>心回来了才是真正的回来了，我已经准备好了，I&rsquo;m back!</h4>
+
+<p>我也非常开心能加入Thoughtworks，在这里有良好的环境和宽松的氛围去尝试新的东西，公司很鼓励学习，更重要的是有很好的朋友让我觉得每天都很开心~</p>
+
+<h4>莫忘初衷！New Start！</h4>
+]]></content>
+  </entry>
+  
+</feed>
