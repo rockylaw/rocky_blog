@@ -1,4 +1,4 @@
 User-agent: *
 Disallow: 
 
-Sitemap: http://roccoliu.com/sitemap.xml 
+Sitemap: http://rockylaw.github.io/rocky_blog//sitemap.xml 
