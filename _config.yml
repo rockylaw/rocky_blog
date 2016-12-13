@@ -103,6 +103,6 @@ facebook_like: false
 # config the content of navigation
 navigation:
 - text: Home
-  url: /rocky_blog/index.html
+  url: /index.html
 - text: Archive
-  url: /rocky_blog/blog/archives
+  url: /blog/archives
