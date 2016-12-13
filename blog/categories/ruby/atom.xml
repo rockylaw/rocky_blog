@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: ruby | Rocky Law's Blog]]></title>
-  <link href="http://rockylaw.github.io/rocky_blog//blog/categories/ruby/atom.xml" rel="self"/>
-  <link href="http://rockylaw.github.io/rocky_blog//"/>
-  <updated>2016-12-13T10:35:07+08:00</updated>
-  <id>http://rockylaw.github.io/rocky_blog//</id>
+  <link href="http://rockylaw.github.io//blog/categories/ruby/atom.xml" rel="self"/>
+  <link href="http://rockylaw.github.io//"/>
+  <updated>2016-12-13T10:40:20+08:00</updated>
+  <id>http://rockylaw.github.io//</id>
   <author>
     <name><![CDATA[Rocky Law]]></name>
     <email><![CDATA[rockylaw@foxmail.com]]></email>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[block、proc和lambda的区别]]></title>
-    <link href="http://rockylaw.github.io/rocky_blog//blog/2014/04/19/difference-between-block-proc-and-lambda/"/>
+    <link href="http://rockylaw.github.io//blog/2014/04/19/difference-between-block-proc-and-lambda/"/>
     <updated>2014-04-19T18:29:13+08:00</updated>
-    <id>http://rockylaw.github.io/rocky_blog//blog/2014/04/19/difference-between-block-proc-and-lambda</id>
+    <id>http://rockylaw.github.io//blog/2014/04/19/difference-between-block-proc-and-lambda</id>
     <content type="html"><![CDATA[<p>这几个概念总是被人问起，搞来搞去的，搞晕了肿么办？谨以此文防止搞晕！</p>
 
 <p>首先要搞清出proc和lambda之间的区别，得给block正名
@@ -117,9 +117,9 @@ lambda对象会去检查传入参数的个数，而proc对象会默认忽略掉�
   
   <entry>
     <title type="html"><![CDATA[深入理解ActiveSupport::Concern]]></title>
-    <link href="http://rockylaw.github.io/rocky_blog//blog/2014/04/11/deeply-understanding-of-active-support-concern/"/>
+    <link href="http://rockylaw.github.io//blog/2014/04/11/deeply-understanding-of-active-support-concern/"/>
     <updated>2014-04-11T15:51:10+08:00</updated>
-    <id>http://rockylaw.github.io/rocky_blog//blog/2014/04/11/deeply-understanding-of-active-support-concern</id>
+    <id>http://rockylaw.github.io//blog/2014/04/11/deeply-understanding-of-active-support-concern</id>
     <content type="html"><![CDATA[<p>当model变得越来越胖的时候，很自然要给model减肥不是？要不然打开model一眼望去看不到头的方法会恼火死人！
 不受人待见的胖model长得像下面这个样子：
 <div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -411,9 +411,9 @@ lambda对象会去检查传入参数的个数，而proc对象会默认忽略掉�
   
   <entry>
     <title type="html"><![CDATA[服务器端使用headless、watir-webdriver、nokogiri抓取ajax数据]]></title>
-    <link href="http://rockylaw.github.io/rocky_blog//blog/2014/04/05/use-headless-watir-webdriver-and-nokogiri-to-get-the-back-content-of-ajax/"/>
+    <link href="http://rockylaw.github.io//blog/2014/04/05/use-headless-watir-webdriver-and-nokogiri-to-get-the-back-content-of-ajax/"/>
     <updated>2014-04-05T21:26:48+08:00</updated>
-    <id>http://rockylaw.github.io/rocky_blog//blog/2014/04/05/use-headless-watir-webdriver-and-nokogiri-to-get-the-back-content-of-ajax</id>
+    <id>http://rockylaw.github.io//blog/2014/04/05/use-headless-watir-webdriver-and-nokogiri-to-get-the-back-content-of-ajax</id>
     <content type="html"><![CDATA[<p>最近一个项目中需要去别的站点上扒下来些数据，但这个站的数据是ajax加载回来的。Nokogiri仅仅是个解析工具不能模拟浏览器的动作，所以要抓取ajax数据必须找个能模拟浏览器点击动作的工具，watir-webdriver就可以帮我们完成这个工作。</p>
 
 <p>watir-webdriver是一款能模拟多种浏览器动作的自动化测试工具。例如填写浏览器表单并提交。</p>
